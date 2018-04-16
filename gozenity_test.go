@@ -78,8 +78,8 @@ func ExampleFileSelection() {
 
 func ExampleFileSelectionWithFilters() {
 	filters := map[string][]string{
-		`Go files`:       []string{`*.go`},
-		`Markdown files`: []string{`*.md`, `*.markdown`},
+		`Go files`:       {`*.go`},
+		`Markdown files`: {`*.md`, `*.markdown`},
 	}
 
 	files, err := gozenity.FileSelection("Choose that guy", filters)
