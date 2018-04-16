@@ -151,6 +151,20 @@ func ExampleScale() {
 	// Output: 23
 }
 
+func ExampleTextInfo() {
+	args := &gozenity.TextInfoArgs{
+		Editable: true,
+	}
+
+	_, err := gozenity.TextInfo("Do something here:", args)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Output: One of Filename, Text or URL need to be supplied
+}
+
 func ExampleTextInfo_second() {
 	args := &gozenity.TextInfoArgs{
 		Editable: true,
@@ -263,20 +277,6 @@ worlded world.`,
 	}
 
 	// Output: Only one of Filename, Text and URL can be supplied
-}
-
-func ExampleTextInfo_eighth() {
-	args := &gozenity.TextInfoArgs{
-		Editable: true,
-	}
-
-	_, err := gozenity.TextInfo("Do something here:", args)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Output: One of Filename, Text or URL need to be supplied
 }
 
 func ExampleColorSelection() {
