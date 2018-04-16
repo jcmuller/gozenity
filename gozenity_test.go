@@ -76,7 +76,7 @@ func ExampleFileSelection() {
 	// Output: file1 file2
 }
 
-func ExampleFileSelectionWithFilters() {
+func ExampleFileSelection_second() {
 	filters := map[string][]string{
 		`Go files`:       {`*.go`},
 		`Markdown files`: {`*.md`, `*.markdown`},
@@ -113,7 +113,8 @@ func _ExampleNotification() {
 
 	// Output:
 }
-func ExampleProgress() {}
+
+func _ExampleProgress() {}
 
 func ExampleQuestion() {
 	answer, err := gozenity.Question("Who? Answer 'her'.")
@@ -150,7 +151,7 @@ func ExampleScale() {
 	// Output: 23
 }
 
-func ExampleTextInfo_Text() {
+func ExampleTextInfo_second() {
 	args := &gozenity.TextInfoArgs{
 		Editable: true,
 		Text: `Hello, worldly
@@ -169,7 +170,7 @@ worlded world.`,
 	// worlded world.
 }
 
-func ExampleTextInfo_TextCheckbox() {
+func ExampleTextInfo_third() {
 	args := &gozenity.TextInfoArgs{
 		Checkbox: "Agree?",
 		Editable: true,
@@ -189,7 +190,7 @@ worlded world.`,
 	// worlded world.
 }
 
-func ExampleTextInfo_URL() {
+func ExampleTextInfo_fourth() {
 	args := &gozenity.TextInfoArgs{
 		Editable: true,
 		URL:      `https://google.com`,
@@ -205,7 +206,7 @@ func ExampleTextInfo_URL() {
 	// Output:
 }
 
-func ExampleTextInfo_Filename() {
+func ExampleTextInfo_fifth() {
 	tmpfile, err := ioutil.TempFile("", "filenametext")
 	if err != nil {
 		log.Fatal(err)
@@ -234,7 +235,7 @@ func ExampleTextInfo_Filename() {
 	// Output: Hello, world!
 }
 
-func ExampleTextInfo_FilenameError() {
+func ExampleTextInfo_sixth() {
 	args := &gozenity.TextInfoArgs{
 		Editable: true,
 		Filename: "/tmp/foobar.txt",
@@ -247,7 +248,7 @@ func ExampleTextInfo_FilenameError() {
 	// Output: stat /tmp/foobar.txt: no such file or directory
 }
 
-func ExampleTextInfo_Error() {
+func ExampleTextInfo_seventh() {
 	args := &gozenity.TextInfoArgs{
 		Editable: true,
 		Text: `Hello, worldly
@@ -264,7 +265,7 @@ worlded world.`,
 	// Output: Only one of Filename, Text and URL can be supplied
 }
 
-func ExampleTextInfo_Error2() {
+func ExampleTextInfo_eighth() {
 	args := &gozenity.TextInfoArgs{
 		Editable: true,
 	}
@@ -278,7 +279,7 @@ func ExampleTextInfo_Error2() {
 	// Output: One of Filename, Text or URL need to be supplied
 }
 
-func ExampleColorSelectionNoPalette() {
+func ExampleColorSelection() {
 	color, err := gozenity.ColorSelection("Choose green:", "green", false)
 
 	if err != nil {
@@ -289,7 +290,7 @@ func ExampleColorSelectionNoPalette() {
 	// Output: rgb(0,128,0)
 }
 
-func ExampleColorSelectionPalette() {
+func ExampleColorSelection_second() {
 	color, err := gozenity.ColorSelection("Choose green:", "green", true)
 
 	if err != nil {
@@ -311,7 +312,7 @@ func ExamplePassword() {
 	// Output: hunter2
 }
 
-func ExamplePasswordWithUsername() {
+func ExampleUsernameAndPassword() {
 	password, username, err := gozenity.UsernameAndPassword("Enter password:")
 
 	if err != nil {
