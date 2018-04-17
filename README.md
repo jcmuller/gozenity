@@ -20,7 +20,7 @@ See [godoc](https://godoc.org/github.com/jcmuller/gozenity#example-List)
 
 ### Simple input
 ```go
-input, err := gozenity.Entry("Enter something:")
+input, err := gozenity.Entry("Enter something:", "placeholder value")
 
 if err != nil {
     log.Panic("Something happened: ", err)
