@@ -205,7 +205,7 @@ func Scale(prompt string, args *ScaleArgs) (answer int, err error) {
 	answer, nerr := strconv.Atoi(ans)
 
 	if nerr != nil {
-		panic(nerr)
+		log.Fatalf("Error converting to int: %s", nerr)
 	}
 
 	return
