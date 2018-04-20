@@ -118,6 +118,33 @@ func Notification(prompt string) (err error) {
 	return
 }
 
+// Progress shows a pogress bar modal
+func Progress(prompt string, progress <-chan int) (err error) {
+	g := New(prompt, "--progress", "--auto-close", "--auto-kill")
+
+	cmd := exec.Command(g.command, g.arguments...)
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		log.Fatalf("Error getting pipe: %s", err)
+	}
+
+	go func(stdin io.WriteCloser) {
+		defer stdin.Close()
+
+		for {
+			select {
+			case p := <-progress:
+				io.WriteString(stdin, fmt.Sprintf("%d\n", p))
+			}
+		}
+	}(stdin)
+
+	err = cmd.Run()
+
+	return
+}
+
 // Question asks for answer
 func Question(prompt string) (answer bool, err error) {
 	g := New(prompt, `--question`)

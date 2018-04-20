@@ -114,7 +114,18 @@ func _ExampleNotification() {
 	// Output:
 }
 
-func _ExampleProgress() {}
+func ExampleProgress() {
+	progress := make(chan int)
+
+	go gozenity.Progress("We're doing that", progress)
+
+	for i := 0; i <= 100; i++ {
+		progress <- i
+		time.Sleep(time.Millisecond * 50)
+	}
+
+	// Output:
+}
 
 func ExampleQuestion() {
 	answer, err := gozenity.Question("Who? Answer 'her'.")
