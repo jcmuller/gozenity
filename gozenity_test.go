@@ -124,7 +124,28 @@ func ExampleProgress() {
 		time.Sleep(time.Millisecond * 50)
 	}
 
-	// Output:
+	// Output: 2
+}
+
+// This example ties a scale to a progress bar.
+func ExampleProgress_second() {
+	progress := make(chan int)
+
+	go gozenity.Progress("Here's the thing", progress)
+
+	args := &gozenity.ScaleArgs{
+		Max:     100,
+		Partial: true,
+		Stream:  progress,
+	}
+
+	_, err := gozenity.Scale("Select a value", args)
+
+	if err != nil {
+		log.Fatalf("Error getting scale: %q", err)
+	}
+
+	// Output: foo
 }
 
 func ExampleQuestion() {
