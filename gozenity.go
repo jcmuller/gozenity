@@ -25,7 +25,7 @@ const (
 // New returns an instance of a Gozenity
 func New(prompt string, arguments ...string) *Gozenity {
 	titles := []string{`--title`, prompt, `--text`, prompt}
-	arguments = append(arguments, titles...)
+	arguments = append(titles, arguments...)
 
 	program, err := exec.LookPath(zenity)
 
@@ -45,7 +45,7 @@ func (e *EmptySelectionError) Error() string {
 
 // List pops up the menu
 func List(prompt string, options ...string) (selection string, err error) {
-	args := []string{`--list`, `--column`, prompt}
+	args := []string{`--list`, `--hide-header`, `--column`, prompt}
 	args = append(args, options...)
 	g := New(prompt, args...)
 	selection, err = g.execute()
