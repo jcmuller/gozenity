@@ -2,10 +2,13 @@
 package gozenity
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
+	"os/signal"
 	"strconv"
 	"strings"
 	"syscall"
@@ -183,29 +186,78 @@ type ScaleArgs struct {
 	Step    int
 	Min     int
 	Max     int
+	Partial bool
+	Stream  chan<- int
+}
+
+func runScaleWithPartialUpdates(cmd *exec.Cmd, output chan<- int) {
+	stdout, err := cmd.StdoutPipe()
+	defer stdout.Close()
+
+	if err != nil {
+		log.Fatalf("Error getting pipe: %s", err)
+	}
+
+	cmd.Start()
+	defer cmd.Wait()
+
+	scanner := bufio.NewScanner(stdout)
+
+	go func() {
+		for scanner.Scan() {
+			str := scanner.Text()
+
+			if err := scanner.Err(); err != nil {
+				fmt.Fprintln(os.Stderr, "reading standard input:", err)
+			}
+
+			n, err := strconv.Atoi(str)
+
+			if err != nil {
+				log.Fatalf("Error converting %s to int, %T, %T: %q", str, str, err, err)
+			}
+
+			output <- n
+		}
+	}()
 }
 
 // Scale shows a nice scale
 func Scale(prompt string, args *ScaleArgs) (answer int, err error) {
-	g := New(
-		prompt,
-		`--scale`,
+	argsFlags := []string{
+		"--scale",
 		fmt.Sprintf("--value=%d", args.Initial),
 		fmt.Sprintf("--min-value=%d", args.Min),
 		fmt.Sprintf("--max-value=%d", args.Max),
 		fmt.Sprintf("--step=%d", args.Step),
-	)
-
-	ans, err := g.execute()
-
-	if ans == "" {
-		return -1, err
 	}
 
-	answer, nerr := strconv.Atoi(ans)
+	if args.Partial {
+		argsFlags = append(argsFlags, "--print-partial")
+	}
 
-	if nerr != nil {
-		log.Fatalf("Error converting to int: %s", nerr)
+	g := New(prompt, argsFlags...)
+
+	cmd := exec.Command(g.command, g.arguments...)
+
+	if args.Partial {
+		runScaleWithPartialUpdates(cmd, args.Stream)
+
+	} else {
+		byteOut, err := cmd.Output()
+
+		// Cast and trim
+		ans := strings.TrimSpace(string(byteOut))
+
+		if ans == "" {
+			return -1, err
+		}
+
+		answer, err = strconv.Atoi(ans)
+
+		if err != nil {
+			log.Fatalf("Error converting to int: %s", err)
+		}
 	}
 
 	return
