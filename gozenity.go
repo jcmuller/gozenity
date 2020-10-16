@@ -48,14 +48,14 @@ func List(prompt string, options ...string) (selection string, err error) {
 	args := []string{`--list`, `--hide-header`, `--column`, prompt}
 	args = append(args, options...)
 	g := New(prompt, args...)
-	selection, err = g.execute()
+	selection, err = g.Execute()
 	return
 }
 
 // Entry asks for input
 func Entry(prompt, placeholder string) (entry string, err error) {
 	g := New(prompt, `--entry`, `--entry-text`, placeholder)
-	entry, err = g.execute()
+	entry, err = g.Execute()
 
 	return
 }
@@ -71,7 +71,7 @@ func Calendar(prompt string, defaultDate time.Time) (date string, err error) {
 		"--date-format", `%m/%d/%Y`,
 	)
 
-	date, err = g.execute()
+	date, err = g.Execute()
 
 	return
 }
@@ -79,7 +79,7 @@ func Calendar(prompt string, defaultDate time.Time) (date string, err error) {
 // Error errors errors
 func Error(prompt string) (err error) {
 	g := New(prompt, `--error`, `--ellipsize`)
-	_, err = g.execute()
+	_, err = g.Execute()
 	return
 }
 
@@ -87,7 +87,7 @@ func Error(prompt string) (err error) {
 func Info(prompt string) (err error) {
 	g := New(prompt, `--info`, `--ellipsize`)
 
-	_, err = g.execute()
+	_, err = g.Execute()
 	return
 }
 
@@ -98,7 +98,7 @@ func FileSelection(prompt string, filtersMap map[string][]string) (files []strin
 	args = append(args, filters...)
 
 	g := New(prompt, args...)
-	result, err := g.execute()
+	result, err := g.Execute()
 	files = strings.Split(result, `|`)
 	return
 }
@@ -106,7 +106,7 @@ func FileSelection(prompt string, filtersMap map[string][]string) (files []strin
 // DirectorySelection opens a file selector
 func DirectorySelection(prompt string) (files []string, err error) {
 	g := New(prompt, `--file-selection`, `--multiple`, `--directory`)
-	result, err := g.execute()
+	result, err := g.Execute()
 	files = strings.Split(result, `|`)
 	return
 }
@@ -114,7 +114,7 @@ func DirectorySelection(prompt string) (files []string, err error) {
 // Notification notifies notifiees
 func Notification(prompt string) (err error) {
 	g := New(prompt, `--notification`, `--listen`)
-	_, err = g.execute()
+	_, err = g.Execute()
 	return
 }
 
@@ -134,7 +134,11 @@ func Progress(prompt string, progress <-chan int) (err error) {
 
 		for {
 			select {
-			case p := <-progress:
+			case p, ok := <-progress:
+				if !ok {
+					return
+				}
+
 				io.WriteString(stdin, fmt.Sprintf("%d\n", p))
 			}
 		}
@@ -173,7 +177,7 @@ func Question(prompt string) (answer bool, err error) {
 func Warning(prompt string) (err error) {
 	g := New(prompt, `--warning`, `--ellipsize`)
 
-	_, err = g.execute()
+	_, err = g.Execute()
 	return
 }
 
@@ -196,7 +200,7 @@ func Scale(prompt string, args *ScaleArgs) (answer int, err error) {
 		fmt.Sprintf("--step=%d", args.Step),
 	)
 
-	ans, err := g.execute()
+	ans, err := g.Execute()
 
 	if ans == "" {
 		return -1, err
@@ -264,7 +268,7 @@ func ColorSelection(prompt, initial string, showPalette bool) (color string, err
 		args = append(args, `--show-palette`)
 	}
 	g := New(prompt, args...)
-	color, err = g.execute()
+	color, err = g.Execute()
 
 	return
 }
@@ -272,7 +276,7 @@ func ColorSelection(prompt, initial string, showPalette bool) (color string, err
 // Password asks for a password
 func Password(prompt string) (password string, err error) {
 	g := New(prompt, `--password`)
-	password, err = g.execute()
+	password, err = g.Execute()
 
 	return
 }
@@ -280,7 +284,7 @@ func Password(prompt string) (password string, err error) {
 // UsernameAndPassword asks for a username and password
 func UsernameAndPassword(prompt string) (password, username string, err error) {
 	g := New(prompt, `--password`, `--username`)
-	string, err := g.execute()
+	string, err := g.Execute()
 
 	str := strings.Split(string, "|")
 	username = str[0]
@@ -301,7 +305,7 @@ func buildFileFilter(filtersMap map[string][]string) (args []string) {
 	return
 }
 
-func (g *Gozenity) execute() (response string, err error) {
+func (g *Gozenity) Execute() (response string, err error) {
 	cmd := exec.Command(g.command, g.arguments...)
 
 	byteOut, err := cmd.Output()
