@@ -149,6 +149,71 @@ func Progress(prompt string, progress <-chan int) (err error) {
 	return
 }
 
+type ChecklistOptions struct {
+	Question              string
+	CheckColumnName       string
+	DescriptionColumnName string
+	Checks                []bool
+	Descriptions          []string
+	Width                 uint
+	Height                uint
+}
+
+func Checklist(options ChecklistOptions) ([]string, error) {
+	if len(options.Question) == 0 {
+		return nil, fmt.Errorf("you should be asking a question")
+	}
+	if len(options.Descriptions) != len(options.Checks) {
+		return nil, fmt.Errorf("the amount of description entries and check entries should be equal")
+	}
+	if options.Width == 0 {
+		options.Width = 800
+	}
+	if options.Height == 0 {
+		options.Height = 400
+	}
+	if len(options.CheckColumnName) == 0 {
+		options.CheckColumnName = "check"
+	}
+	if len(options.DescriptionColumnName) == 0 {
+		options.DescriptionColumnName = "description"
+	}
+
+	checklistSlice := []string{
+		"--list",
+		"--checklist",
+		fmt.Sprintf("--width=%d", options.Width),
+		fmt.Sprintf("--height=%d", options.Height),
+		fmt.Sprintf("--column=%s", options.CheckColumnName),
+		fmt.Sprintf("--column=%s", options.DescriptionColumnName),
+	}
+
+	for i := range options.Checks {
+		state := "FALSE"
+		if options.Checks[i] {
+			state = "TRUE"
+		}
+
+		checklistSlice = append(checklistSlice, state)
+		checklistSlice = append(checklistSlice, options.Descriptions[i])
+	}
+
+	g := New(options.Question, checklistSlice...)
+
+	selection, err := g.Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(selection) == 0 {
+		return make([]string, 0), nil
+	}
+
+	selections := strings.Split(selection, "|")
+
+	return selections, nil
+}
+
 // Question asks for answer
 func Question(prompt string) (answer bool, err error) {
 	g := New(prompt, `--question`)
