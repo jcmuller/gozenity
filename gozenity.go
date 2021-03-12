@@ -3,6 +3,7 @@ package gozenity
 
 import (
 	"fmt"
+	"github.com/thoas/go-funk"
 	"io"
 	"log"
 	"os/exec"
@@ -24,7 +25,12 @@ const (
 
 // New returns an instance of a Gozenity
 func New(prompt string, arguments ...string) *Gozenity {
-	titles := []string{`--title`, prompt, `--text`, prompt}
+	return NewWithSeparateText(prompt, prompt, arguments...)
+}
+
+// NewWithSeparateText returns an instance of a Gozenity
+func NewWithSeparateText(title string, text string, arguments ...string) *Gozenity {
+	titles := []string{`--title`, title, `--text`, text}
 	arguments = append(titles, arguments...)
 
 	program, err := exec.LookPath(zenity)
@@ -236,6 +242,49 @@ func Question(prompt string) (answer bool, err error) {
 	}
 
 	return true, nil
+}
+
+type FormEntry struct {
+	Type        string // entry, password
+	DisplayName string
+}
+
+type FormInput struct {
+	Title   string
+	Text    string
+	Entries []FormEntry
+}
+
+func validEntryTypes() []string {
+	return []string{
+		"entry",
+		"password",
+	}
+}
+
+// Form creates forms
+func Form(input FormInput) ([]string, error) {
+	if len(input.Entries) == 0 {
+		return nil, fmt.Errorf("forms should have at least one entry")
+	}
+
+	formEntries := make([]string, 0, len(input.Entries))
+	for _, entry := range input.Entries {
+		if !funk.ContainsString(validEntryTypes(), entry.Type) {
+			return nil, fmt.Errorf("can not handle entry type '%s'", entry.Type)
+		}
+
+		formEntries = append(formEntries, fmt.Sprintf(`--add-%s=%s`, entry.Type, entry.DisplayName))
+	}
+
+	g := NewWithSeparateText(input.Title, input.Text, append([]string{`--forms`}, formEntries...)...)
+
+	r, err := g.Execute()
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute form")
+	}
+
+	return strings.Split(r, "|"), nil
 }
 
 // Warning warns about warnings
