@@ -1,5 +1,9 @@
 # gozenity : Simple gozenity wrapper in go
 
+> **Note**
+> This repository has moved to [sourcehut](https://git.sr.ht/~jcmuller/gozenity).
+
+
 ## Overview
 [![GoDoc](https://godoc.org/github.com/jcmuller/gozenity?status.svg)](https://godoc.org/github.com/jcmuller/gozenity)
 [![Code Climate](https://codeclimate.com/github/jcmuller/gozenity/badges/gpa.svg)](https://codeclimate.com/github/jcmuller/gozenity)
